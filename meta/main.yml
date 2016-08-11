@@ -1,0 +1,5 @@
+galaxy_info:
+  author: Ricardo Mota
+  license: license BSD
+  min_ansible_version: 1.2
+  galaxy_tags: [aws, lambda, cloudwatch, slack, opsChat]
