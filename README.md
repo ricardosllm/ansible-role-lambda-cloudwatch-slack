@@ -1,7 +1,7 @@
 lambda-cloudwatch-slack
 =========
 
-Rola to enable AWS cloudWatch Alarms to Slack integration
+[Ansible](https://www.ansible.com/) role to enable sending [AWS CloudWatch](https://aws.amazon.com/cloudwatch/) Alarms to [Slack](https://slack.com/)
 
 Example Playbook
 ----------------
