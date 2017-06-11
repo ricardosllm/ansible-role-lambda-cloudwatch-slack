@@ -1,2 +1,68 @@
 ---
-# tasks file for ansible-role-lambda-cloudwatch-slack
+- name: Create slack lambda source for service
+  debug: msg={{ service }}
+
+- set_fact:
+    buckeName: "{{ namespace }}_{{ service }}_slack_lambda_{{ deployment_env }}_source"
+    functionName: "{{ namespace }}_{{ service }}_slack_lambda_{{ deployment_env }}"
+
+- name: Register if lambda already exists
+  command: >
+    aws lambda get-function
+    --function-name {{ functionName }}
+    --profile {{ deployment_env }}
+  register: function_name
+  ignore_errors: yes
+
+- name: Create source bucket
+  s3:
+    bucket: "{{ buckeName }}"
+    permission: "public-read"
+    region: "{{ aws.region }}"
+    mode: "create"
+
+- name: create release directory
+  file: path=slack-lambda state=directory
+  tags: release
+
+- name: copy source
+  git:
+    repo=https://github.com/ricardosllm/lambda-cloudwatch-slack.git
+    dest=slack-lambda
+    version=master
+  tags: release
+
+- name: build config
+  template:
+    src=config.js
+    dest=slack-lambda/config.js
+  tags: release
+
+- name: install dependencies
+  npm:
+    path: slack-lambda
+  tags: release
+
+- name: Compile node source
+  shell: "zip -r index.zip ."
+  args:
+    chdir: slack-lambda
+  tags: release
+
+- name: Upload node source
+  shell: 'aws s3 cp index.zip s3://{{ buckeName }}'
+  args:
+    chdir: slack-lambda
+  tags: release
+
+- name: Update function code if applicable
+  command: >
+    aws lambda update-function-code
+    --function-name {{ functionName }}
+    --s3-bucket {{ buckeName }}
+    --s3-key index.zip
+  when: function_name.stdout
+
+- name: empty release directory
+  file: path=slack-lambda state=absent
+  tags: release
