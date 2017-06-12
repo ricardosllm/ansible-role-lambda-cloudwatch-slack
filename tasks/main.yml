@@ -1,10 +1,11 @@
 ---
 - name: Create slack lambda source for service
-  debug: msg={{ service }}
+  debug: msg={{ MyAwesomeService.name }}
 
 - set_fact:
-    buckeName: "{{ namespace }}_{{ service }}_slack_lambda_{{ deployment_env }}_source"
-    functionName: "{{ namespace }}_{{ service }}_slack_lambda_{{ deployment_env }}"
+    functionName: "{{ namespace }}_{{ MyAwesomeService.name }}_slack_lambda_{{ deployment_env }}"
+    buckeName: "{{ functionName }}_source"
+
 
 - name: Register if lambda already exists
   command: >
