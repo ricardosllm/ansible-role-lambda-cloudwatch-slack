@@ -1,2 +1,11 @@
 ---
-# defaults file for ansible-role-lambda-cloudwatch-slack
+deployment_env: "development" # recommend setting it at runtime from the CLI
+
+namespace: "my_project"
+
+aws:
+  region: "us-east-1"
+
+MyAwesomeService:
+  name: "awsome"
+  slackHookUrl: "https://hooks.slack.com/services/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"
